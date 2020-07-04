@@ -1,2 +1,2 @@
-# HparasuisSero
+# HpsuisSero
 Rapid Haemophilus parasuis serotyping pipeline for Nanpore data
