@@ -43,7 +43,7 @@ done
 
 if [ -z $sample_name ]; then
     usage
-    echo "Sample name was not given exiting"
+    echo "Sample name was not given, exiting"
     exit 1
 fi
 
@@ -94,7 +94,7 @@ blast_search() {
         if [ $(wc -l < $2/blast_res.tab) -eq 0 ]; then
             serotype="No Hits"
         elif [ $(wc -l < $2/blast_res.tab) -ge 2 ]; then
-            serotype=$(cat $2/blast_res.tab | cut -f2 | awk '{gsub(/serotype-/,"")}1' |  paste -sd "|" -)
+            serotype=$(cat $2/blast_res.tab | cut -f2 | awk '{gsub(/serotype-/,"")}1' | sort -u | paste -sd "|" -)
         else
             serotype=$(cat $2/blast_res.tab | cut -f2 | awk '{gsub(/serotype-/,"")}1')
         fi
@@ -106,8 +106,11 @@ blast_search() {
 }
 
 feature_identification() {
+    
+    local IFS="|"
+    serotypeArray=($serotype)
 
-    if [ $(echo $serotype | grep "5") ]; then
+    if [[ " ${serotypeArray[@]} " =~ " 5 " ]]; then
 
         mkdir -p $2
 
@@ -118,16 +121,22 @@ feature_identification() {
         blast_formatter -archive $2/blast_res.out -outfmt "7 qacc sacc evalue qstart qend sstart send" | awk '!/#/{print}' > $2/blast_res.tab
 
         if [ $(wc -l < $2/blast_res.tab) -ge 1 ]; then
-            serotype=$(echo $serotype | awk '{gsub(/5/,"12")}1')    
+            for (( i=0; i<${#serotypeArray[@]}; i++ )); do
+                if [[ ${serotypeArray[i]} == "5" ]]; then
+                    serotypeArray[i]="12"
+                fi
+            done
         fi
     fi
+
+    serotype="$(printf "|%s" ${serotypeArray[@]})"
             
 }
 
 write_file() {
 
     header=$(echo -e "Sample_Name\tSerotype")
-    contents=$(echo -e "$sample_name\t$serotype")
+    contents=$(echo -e "$sample_name\t${serotype:1}")
 
     echo $header > $1/${sample_name}_serotyping_res.tsv
     echo $contents >> $1/${sample_name}_serotyping_res.tsv
@@ -139,6 +148,7 @@ clean() {
     rm $1/*.bam.bai
     rm $1/*.hdf
 }
+
 # main
 main() {
 
