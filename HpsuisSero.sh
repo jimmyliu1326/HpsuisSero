@@ -57,17 +57,8 @@ assembly() {
 
     if test -f $1; then
 
-        # read overlap
-        minimap2 -t $n_threads -x ava-ont $1 $1 > $2/overlaps.paf
-
-        # generate OLC graph
-        miniasm -f $1 $2/overlaps.paf > $2/graph.gfa
-
-        # minipolish
-        minipolish -t $n_threads --rounds 2 $1 $2/graph.gfa > $2/graph_polished.gfa
-
-        # convert to fasta format
-        awk '$1 ~/S/ {print ">"$2"\n"$3}' $2/graph_polished.gfa > $2/graph_polished.fasta
+        # Flye assembly
+        flye -t $n_threads --nano-raw $1 -g 2m -i 2 -o $2
         
         # genome polish
         medaka_consensus -t $n_threads -i $1 -d $2/graph_polished.fasta -o $out_dir -f
