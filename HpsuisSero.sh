@@ -61,7 +61,7 @@ assembly() {
         flye -t $n_threads --nano-raw $1 -g 2m -i 2 -o $2
         
         # genome polish
-        medaka_consensus -t $n_threads -i $1 -d $2/graph_polished.fasta -o $out_dir -f
+        medaka_consensus -t $n_threads -i $1 -d $2/assembly.fasta -o $out_dir -f
         mv $out_dir/consensus.fasta $out_dir/$sample_name.fasta
     else
         echo "$1 cannot be found"
