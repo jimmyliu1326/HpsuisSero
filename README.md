@@ -1,7 +1,7 @@
 # HpsuisSero
 
 ## Description
-This pipeline is designed to rapidly infer Haemophilus parasuis serotype from Oxford Nanopore Data by first assemblying a draft genome using Miniasm followed by genome polishing with racon and medaka. The processed assembly is subsequently queried against the Cps Blast Database to determine isolate serotype. An additional feature identification step is required to resolve between serotype 5 and 12.
+This pipeline is designed to rapidly infer Haemophilus parasuis serotype from Oxford Nanopore Data by first assemblying a draft genome using Flye followed by genome polishing with medaka. The processed assembly is subsequently queried against the Cps Blast Database to determine isolate serotype. An additional feature identification step is required to resolve between serotype 5 and 12.
 
 ## Usage
 <pre>
@@ -26,7 +26,6 @@ conda install -c bioconda hpsuissero
 ```
 
 ### Dependencies
-* Miniasm >= 0.3_r179
 * Medaka >= 1.0.1
 * Blast >= 2.6
-* Minipolish >= 0.1.2
+* Flye >= 2.7.1
