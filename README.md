@@ -6,13 +6,14 @@ This pipeline is designed to rapidly infer Haemophilus parasuis serotype from Ox
 ## Usage
 <pre>
 <b>Required arguments:</b>
--i  input raw reads
+-i  input file
 -o  path to output directory
 -s  sample name
+-x  input type [fasta or fastq]
 
 <b>Optional arguments:</b>
 -h|--help       display help message
--t|--threads    number of threads [4]
+-t|--threads    number of threads [Default: 4]
 
 <b>Example Command Line:</b>
 HpsuisSero.sh -s Sample_1 -i /path/to/Sample_1.fastq -o /path/to/output
