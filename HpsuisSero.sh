@@ -5,13 +5,14 @@ usage() {
 Usage: $0
 
 Required arguments:
--i  input raw reads
+-i  input file
 -o  path to output directory
 -s  sample name
+-x  input type [fasta or fastq]
 
 Optional arguments:
 -h|--help       display help message
--t|--threads    number of threads [4]
+-t|--threads    number of threads [Default: 4]
 "
 }
 
@@ -27,23 +28,37 @@ then
     exit 0
 fi
 
-opts=`getopt -o hi:o:s:t: -l help,threads: -- "$@"`
+opts=`getopt -o hi:o:s:t:x: -l help,threads: -- "$@"`
 eval set -- "$opts"
 
 while true; do
     case "$1" in
-        -i) read_path=$2; shift 2 ;;
+        -i) input_path=$2; shift 2 ;;
         -o) out_dir=$2; shift 2 ;;
         -s) sample_name=$2; shift 2 ;;
+        -x) input_type=$2; shift 2 ;;
         -t|--threads) n_threads=$2; shift 2 ;;
         --) shift; break ;;
         -h|--help) usage; exit 0;;
     esac
 done
 
+# check if required argument present
 if [ -z $sample_name ]; then
     usage
-    echo "Sample name was not given, exiting"
+    echo "Required argument -s is missing, exiting"
+    exit 1
+elif [ -z $input_path ]; then
+    usage
+    echo "Required argument -i is missing, exiting"
+    exit 1
+elif [ -z $out_dir ]; then
+    usage
+    echo "Required argument -o is missing, exiting"
+    exit 1
+elif [ -z $input_type ]; then
+    usage
+    echo "Required argument -x is missing, exiting"
     exit 1
 fi
 
@@ -143,11 +158,18 @@ clean() {
 # main
 main() {
 
-    assembly $read_path $out_dir/assembly
-    blast_search $out_dir/$sample_name.fasta $out_dir/blast_res
-    feature_identification $out_dir/$sample_name.fasta $out_dir/feature_identification
+    if [[ $input_type == "fastq" ]]; then
+        assembly $input_path $out_dir/assembly
+        blast_search $out_dir/$sample_name.fasta $out_dir/blast_res
+        feature_identification $out_dir/$sample_name.fasta $out_dir/feature_identification
+        clean $out_dir
+    else
+        blast_search $input_path $out_dir/blast_res
+        feature_identification $input_path $out_dir/feature_identification
+    fi
+    
     write_file $out_dir
-    clean $out_dir
+    
     echo "Pipeline Finished!"
 
 }
